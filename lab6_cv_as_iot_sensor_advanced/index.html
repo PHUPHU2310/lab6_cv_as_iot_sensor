@@ -42,6 +42,35 @@ th{background:#eef4fb;color:var(--blue);font-size:12px;}
 .event-NORMAL{color:var(--green);}
 .event-WARNING{color:var(--red);}
 hr{border:0;border-top:1px solid var(--line);margin:14px 0;}
+
+/* ===== MOTION NOTIFICATION ===== */
+#motionBanner{
+  display:none;
+  position:sticky;top:0;z-index:999;
+  background:#b91c1c;color:#fff;
+  padding:12px 20px;
+  font-weight:700;font-size:15px;
+  display:flex;align-items:center;gap:12px;
+  box-shadow:0 3px 12px rgba(185,28,28,.4);
+}
+#motionBanner.hidden{display:none!important;}
+#motionBanner .dismiss{margin-left:auto;background:rgba(255,255,255,.25);border:0;color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-weight:700;font-size:13px;}
+#motionBanner .score{background:rgba(255,255,255,.2);border-radius:6px;padding:2px 8px;font-size:13px;}
+
+#toastContainer{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+.toast{
+  background:#1e2836;color:#fff;border-radius:10px;
+  padding:12px 16px;min-width:280px;max-width:360px;
+  box-shadow:0 4px 16px rgba(0,0,0,.35);
+  font-size:13px;pointer-events:auto;
+  animation:slideIn .3s ease;
+  border-left:4px solid var(--red);
+}
+.toast.ok{border-left-color:var(--green);}
+.toast .t-title{font-weight:700;font-size:14px;margin-bottom:3px;}
+.toast .t-close{float:right;background:0;border:0;color:#9ca3af;cursor:pointer;font-size:15px;margin-top:-2px;}
+@keyframes slideIn{from{transform:translateX(110%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+@keyframes slideOut{from{transform:translateX(0);opacity:1;}to{transform:translateX(110%);opacity:0;}}
 </style>
 </head>
 <body>
@@ -49,6 +78,19 @@ hr{border:0;border-top:1px solid var(--line);margin:14px 0;}
 <h1>Lab 6 Advanced — Computer Vision as IoT Sensor: Parameter Experiment</h1>
 <p>ROI · Threshold · Canny Edge · Brightness · Blur Score · Motion Score · Event Rule · Parameter Log → Dashboard</p>
 </header>
+
+<!-- MOTION ALERT BANNER (sticky) -->
+<div id="motionBanner" class="hidden">
+  <span>🚨</span>
+  <span id="bannerText">MOTION DETECTED</span>
+  <span class="score" id="bannerScore"></span>
+  <span id="bannerTime" style="font-size:12px;opacity:.8"></span>
+  <button class="dismiss" onclick="dismissBanner()">✕ Đóng</button>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div id="toastContainer"></div>
+
 <main>
 
 <!-- ===== SECTION 1: CAMERA + PARAMS ===== -->
@@ -169,7 +211,16 @@ hr{border:0;border-top:1px solid var(--line);margin:14px 0;}
 <div class="card"><div class="metric" id="metadataCount">0</div><div class="small">ảnh đã ghi metadata</div></div>
 <div class="card"><div class="metric" id="eventCount">0</div><div class="small">event đã sinh</div></div>
 <div class="card"><div class="metric" id="paramCount">0</div><div class="small">experiment đã log</div></div>
-<div class="card"><div class="metric" id="latestEvent">-</div><div class="small" id="latestSeverity">event mới nhất</div></div>
+<div class="card" style="position:relative">
+  <div class="metric" id="latestEvent">-</div>
+  <div class="small" id="latestSeverity">event mới nhất</div>
+  <div style="margin-top:8px;display:flex;align-items:center;gap:6px">
+    <label style="margin:0;font-size:11px;color:#6b7280">🔔 Thông báo</label>
+    <input type="checkbox" id="notifyToggle" checked title="Bật/tắt toast thông báo" style="width:auto;cursor:pointer" />
+    <label style="margin:0;font-size:11px;color:#6b7280">🔊 Âm thanh</label>
+    <input type="checkbox" id="soundToggle" title="Bật/tắt âm thanh" style="width:auto;cursor:pointer" />
+  </div>
+</div>
 </div>
 
 <!-- ===== SECTION 6: JSON RESPONSE ===== -->
@@ -333,6 +384,94 @@ async function refreshDashboard() {
 
 refreshDashboard();
 setInterval(refreshDashboard, 6000);
+
+// ---------------------------------------------------------------------------
+// Motion notification system
+// ---------------------------------------------------------------------------
+let _lastSeenEventId = null;
+let _motionAudio = null;
+
+function _beep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type = 'square'; o.frequency.value = 880;
+    g.gain.setValueAtTime(0.3, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+    o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.4);
+  } catch(e) {}
+}
+
+function showToast(title, body, isWarning) {
+  if (!document.getElementById('notifyToggle').checked) return;
+  const wrap = document.getElementById('toastContainer');
+  const el = document.createElement('div');
+  el.className = 'toast' + (isWarning ? '' : ' ok');
+  el.innerHTML = `<button class="t-close" onclick="this.closest('.toast').remove()">✕</button>
+    <div class="t-title">${title}</div>
+    <div>${body}</div>`;
+  wrap.appendChild(el);
+  setTimeout(() => {
+    el.style.animation = 'slideOut .3s ease forwards';
+    setTimeout(() => el.remove(), 300);
+  }, 5000);
+}
+
+function showMotionBanner(eventType, score, timestamp) {
+  const banner = document.getElementById('motionBanner');
+  banner.classList.remove('hidden');
+  banner.style.background = eventType === 'MOTION_DETECTED' ? '#b91c1c' : '#15803d';
+  document.getElementById('bannerText').textContent =
+    eventType === 'MOTION_DETECTED' ? '🚨 MOTION DETECTED — Phát hiện chuyển động!' :
+    eventType === 'COOLDOWN_SKIP'    ? '⏱ COOLDOWN SKIP — Event bị bỏ qua do cooldown' :
+                                       '✅ NO SIGNIFICANT MOTION';
+  document.getElementById('bannerScore').textContent = score ? `score: ${score}` : '';
+  document.getElementById('bannerTime').textContent  = timestamp || '';
+}
+
+function dismissBanner() {
+  document.getElementById('motionBanner').classList.add('hidden');
+}
+
+async function pollMotionEvents() {
+  try {
+    const resp = await fetch('/events?limit=5');
+    const data = await resp.json();
+    if (!data.items || data.items.length === 0) return;
+
+    const latest = data.items[data.items.length - 1];
+    const eid = latest.event_id;
+    if (eid === _lastSeenEventId) return;
+    _lastSeenEventId = eid;
+
+    const evType = latest.event_type || '';
+    const sev    = latest.severity   || '';
+    const score  = latest.score      || '';
+    const ts     = latest.timestamp  || '';
+
+    // Motion events → banner + toast + sound
+    if (evType === 'MOTION_DETECTED') {
+      showMotionBanner(evType, score, ts);
+      showToast('🚨 MOTION DETECTED', `score: ${score} | ${ts}`, true);
+      if (document.getElementById('soundToggle').checked) _beep();
+    } else if (evType === 'COOLDOWN_SKIP') {
+      showMotionBanner(evType, score, ts);
+      showToast('⏱ COOLDOWN SKIP', `Event bị suppressed | ${ts}`, false);
+    } else if (evType === 'NO_SIGNIFICANT_MOTION') {
+      showToast('✅ No Motion', `score: ${score} | ${ts}`, false);
+    }
+    // Quality warnings → toast only
+    else if (sev === 'WARNING') {
+      showToast(`⚠ ${evType}`, `score: ${score} | ${ts}`, true);
+    }
+  } catch(e) {}
+}
+
+// Poll motion events every 3s (faster than full dashboard refresh)
+setInterval(pollMotionEvents, 3000);
+pollMotionEvents();
 </script>
 </body>
 </html>
