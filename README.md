@@ -1,4 +1,4 @@
-# Lab 6 — Computer Vision as IoT Sensor
+<img width="842" height="431" alt="image" src="https://github.com/user-attachments/assets/b08bd7d6-0b1e-4418-b27f-b5b5ff1e92e1" /># Lab 6 — Computer Vision as IoT Sensor
 
 > **Môn học**: Triển khai, phát triển ứng dụng AI và IoT  
 > **Vị trí**: Buổi 6 trong chuỗi AIoT Deployment Pipeline  
@@ -106,6 +106,8 @@ uvicorn app:app --reload --host 0.0.0.0 --port 8000
 ```
 
 Mở trình duyệt: **http://127.0.0.1:8000/**
+<img width="1365" height="695" alt="image" src="https://github.com/user-attachments/assets/5987e506-d908-4ded-aaa1-22a12e00362e" />
+<img width="842" height="431" alt="image" src="https://github.com/user-attachments/assets/cfe599bb-12cc-4e2a-894c-ab5891302f20" />
 
 ### API endpoints
 
@@ -168,6 +170,8 @@ uvicorn app:app --reload --host 0.0.0.0 --port 8001 --app-dir .
 ```
 
 Mở trình duyệt: **http://127.0.0.1:8001/**
+<img width="1365" height="697" alt="image" src="https://github.com/user-attachments/assets/426aa710-7a38-48b8-8d1d-14e80db03b98" />
+<img width="1033" height="515" alt="image" src="https://github.com/user-attachments/assets/eb876e36-aa1a-449d-97ab-31c10e6a3725" />
 
 ### Tham số thử nghiệm
 
