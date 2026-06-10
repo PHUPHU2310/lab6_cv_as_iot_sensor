@@ -2,7 +2,8 @@
 
 > **Môn học**: Triển khai, phát triển ứng dụng AI và IoT  
 > **Vị trí**: Buổi 6 trong chuỗi AIoT Deployment Pipeline  
-> **Tác giả**: PHUPHU2310
+> **Tác giả**: PHUPHU2310  
+> **Cập nhật**: 2026-06-10
 
 ---
 
@@ -13,10 +14,14 @@ Lab này đưa camera hoặc ảnh vào hệ thống AIoT như một **cảm bi�
 ```
 Camera / Ảnh
   → Stream / Snapshot / Upload
-  → Xử lý ảnh (resize, grayscale, threshold, edge)
-  → Ghi metadata (image_metadata.csv)
-  → Sinh event (image_event_log.csv)
-  → Dashboard (index.html tại http://127.0.0.1:8000)
+  → ROI crop (optional)
+  → Xử lý ảnh (resize, grayscale, threshold, edge, mask, quality info)
+  → Tính brightness + blur_score
+  → Ghi metadata  → image_metadata.csv
+  → Sinh event    → image_event_log.csv
+  → Ghi tham số  → parameter_experiment_log.csv
+  → 🔔 Motion Notification (banner + toast + âm thanh)
+  → Dashboard (http://127.0.0.1:8000 | http://127.0.0.1:8001)
 ```
 
 ---
@@ -142,6 +147,7 @@ Mở trình duyệt: **http://127.0.0.1:8000/**
 | `rule_used` trong event | Không | Có — truy vết điều kiện kích hoạt |
 | Parameter log | Không | `parameter_experiment_log.csv` |
 | Motion cooldown | Không | Có — `COOLDOWN_SKIP` event |
+| **Motion notification** | Không | **Banner đỏ + toast popup + âm thanh** |
 
 ### Cài đặt và chạy
 
@@ -182,6 +188,25 @@ Mở trình duyệt: **http://127.0.0.1:8001/**
 | `POST /upload-image-advanced` | Upload ảnh vào advanced pipeline |
 | `GET /motion-capture-advanced` | Motion với cooldown + ROI |
 | `GET /parameter-experiments` | Đọc parameter_experiment_log.csv |
+
+---
+
+## Motion Notification System (Advanced)
+
+Dashboard nâng cao có hệ thống thông báo realtime khi phát hiện chuyển động:
+
+| Thành phần | Mô tả |
+|---|---|
+| **Sticky Banner** | Dải đỏ cố định đầu trang, hiển thị event type + motion score + timestamp. Có nút ✕ Đóng |
+| **Toast Popup** | Popup góc phải dưới, tự động mờ sau 5 giây |
+| **Âm thanh** | Beep ngắn qua Web Audio API (bật/tắt bằng checkbox) |
+| **Polling 3s** | Kiểm tra event mới mỗi 3 giây — nhanh hơn dashboard refresh (6s) |
+
+**Event → Thông báo:**
+- `MOTION_DETECTED` → banner đỏ + toast đỏ + beep
+- `COOLDOWN_SKIP` → banner xanh + toast xanh (event bị suppressed)
+- `NO_SIGNIFICANT_MOTION` → toast xanh
+- `LOW_LIGHT` / `BLURRY_IMAGE` / `OVER_EXPOSED_IMAGE` → toast đỏ
 
 ---
 
