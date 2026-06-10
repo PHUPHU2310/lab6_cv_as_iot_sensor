@@ -24,6 +24,19 @@ img{max-width:100%;border:1px solid #ccd6e0;border-radius:10px;background:#eef2f
 pre{background:#0b1220;color:#e5e7eb;border-radius:10px;padding:12px;overflow:auto;max-height:360px;}
 table{width:100%;border-collapse:collapse;font-size:13px;} th,td{border-bottom:1px solid #e5e7eb;padding:8px;text-align:left;} th{background:#eef4fb;color:#0b3f75;}
 .badge{display:inline-block;background:#e8f2ff;color:#0b3f75;padding:3px 8px;border-radius:999px;font-size:12px;font-weight:700;margin-left:6px;}
+
+/* ===== MOTION NOTIFICATION ===== */
+#motionBanner{display:none;position:sticky;top:0;z-index:999;background:#b91c1c;color:#fff;padding:11px 20px;font-weight:700;font-size:15px;align-items:center;gap:10px;box-shadow:0 3px 12px rgba(185,28,28,.4);}
+#motionBanner.show{display:flex;}
+#motionBanner .score{background:rgba(255,255,255,.2);border-radius:6px;padding:2px 8px;font-size:13px;}
+#motionBanner .dismiss{margin-left:auto;background:rgba(255,255,255,.25);border:0;color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-weight:700;}
+#toastContainer{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+.toast{background:#1e2836;color:#fff;border-radius:10px;padding:11px 15px;min-width:270px;max-width:340px;box-shadow:0 4px 16px rgba(0,0,0,.35);font-size:13px;pointer-events:auto;border-left:4px solid #b91c1c;animation:toastIn .3s ease;}
+.toast.ok{border-left-color:#15803d;}
+.toast b{display:block;font-size:14px;margin-bottom:3px;}
+.toast .tc{float:right;background:0;border:0;color:#9ca3af;cursor:pointer;font-size:15px;margin-top:-2px;}
+@keyframes toastIn{from{transform:translateX(110%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+@keyframes toastOut{from{opacity:1;}to{opacity:0;transform:translateX(110%);}}
 </style>
 </head>
 <body>
@@ -31,6 +44,18 @@ table{width:100%;border-collapse:collapse;font-size:13px;} th,td{border-bottom:1
 <h1>Lab 6 - Computer Vision as IoT Sensor</h1>
 <p>Camera/ảnh được đưa vào hệ thống như một cảm biến IoT: stream → snapshot/video/motion → xử lý ảnh → metadata → event → dashboard.</p>
 </header>
+
+<!-- MOTION ALERT BANNER -->
+<div id="motionBanner">
+  <span>🚨</span>
+  <span id="bannerText">MOTION DETECTED</span>
+  <span class="score" id="bannerScore"></span>
+  <span id="bannerTime" style="font-size:12px;opacity:.8"></span>
+  <button class="dismiss" onclick="document.getElementById('motionBanner').classList.remove('show')">✕ Đóng</button>
+</div>
+<!-- TOAST CONTAINER -->
+<div id="toastContainer"></div>
+
 <main>
 <section class="card">
 <h2>1. Điều khiển camera stream <span class="badge">Laptop camera hoặc IP camera</span></h2>
@@ -55,7 +80,15 @@ table{width:100%;border-collapse:collapse;font-size:13px;} th,td{border-bottom:1
 <section class="grid3">
 <div class="card"><div class="metric" id="metadataCount">0</div><div>ảnh đã ghi metadata</div></div>
 <div class="card"><div class="metric" id="eventCount">0</div><div>event đã sinh</div></div>
-<div class="card"><div class="metric" id="latestEvent">-</div><div>event mới nhất</div></div>
+<div class="card">
+  <div class="metric" id="latestEvent">-</div><div>event mới nhất</div>
+  <div style="margin-top:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+    <label style="font-size:12px;color:#4b5563;margin:0">🔔 Thông báo</label>
+    <input type="checkbox" id="notifyToggle" checked style="width:auto;cursor:pointer" />
+    <label style="font-size:12px;color:#4b5563;margin:0">🔊 Âm thanh</label>
+    <input type="checkbox" id="soundToggle" style="width:auto;cursor:pointer" />
+  </div>
+</div>
 </section>
 <section class="card"><h2>2. Kết quả thao tác gần nhất</h2><pre id="out">Chưa có dữ liệu. Thực hiện stream, snapshot, upload ảnh hoặc motion capture để quan sát JSON response.</pre></section>
 <section class="grid2">
@@ -77,6 +110,59 @@ function tableFromRows(rows, cols){ if(!rows || rows.length===0) return '<p clas
 async function refreshDashboard(){ const latest=await (await fetch('/latest')).json(); document.getElementById('metadataCount').textContent=latest.metadata_count || 0; document.getElementById('eventCount').textContent=latest.event_count || 0; document.getElementById('latestEvent').textContent=(latest.latest_event && latest.latest_event.event_type) ? latest.latest_event.event_type : '-'; if(latest.raw_image_url){document.getElementById('raw').src=latest.raw_image_url+'?t='+Date.now();} if(latest.processed_image_url){document.getElementById('processed').src=latest.processed_image_url+'?t='+Date.now();}
  const meta=await (await fetch('/metadata?limit=8')).json(); const ev=await (await fetch('/events?limit=8')).json(); document.getElementById('metadataTable').innerHTML=tableFromRows(meta.items,['image_id','timestamp','source_type','width','height','brightness','processing_status']); document.getElementById('eventTable').innerHTML=tableFromRows(ev.items,['event_type','timestamp','severity','score','explanation']); }
 refreshDashboard(); setInterval(refreshDashboard, 5000);
+
+// ---------------------------------------------------------------------------
+// Motion notification
+// ---------------------------------------------------------------------------
+let _lastEvId = null;
+
+function _beep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type = 'square'; o.frequency.value = 880;
+    g.gain.setValueAtTime(0.3, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+    o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.4);
+  } catch(e) {}
+}
+
+function showToast(title, body, warn) {
+  if (!document.getElementById('notifyToggle').checked) return;
+  const el = document.createElement('div');
+  el.className = 'toast' + (warn ? '' : ' ok');
+  el.innerHTML = `<button class="tc" onclick="this.closest('.toast').remove()">✕</button><b>${title}</b>${body}`;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => { el.style.animation='toastOut .3s ease forwards'; setTimeout(()=>el.remove(),300); }, 5000);
+}
+
+async function pollMotion() {
+  try {
+    const ev = await (await fetch('/events?limit=5')).json();
+    if (!ev.items || !ev.items.length) return;
+    const latest = ev.items[ev.items.length - 1];
+    if (latest.event_id === _lastEvId) return;
+    _lastEvId = latest.event_id;
+    const t = latest.event_type || '', sc = latest.score || '', ts = latest.timestamp || '';
+    if (t === 'MOTION_DETECTED') {
+      const b = document.getElementById('motionBanner');
+      b.classList.add('show'); b.style.background='#b91c1c';
+      document.getElementById('bannerText').textContent = '🚨 MOTION DETECTED — Phát hiện chuyển động!';
+      document.getElementById('bannerScore').textContent = sc ? `score: ${sc}` : '';
+      document.getElementById('bannerTime').textContent = ts;
+      showToast('🚨 MOTION DETECTED', `score: ${sc} | ${ts}`, true);
+      if (document.getElementById('soundToggle').checked) _beep();
+    } else if (t === 'NO_SIGNIFICANT_MOTION') {
+      showToast('✅ No Motion', `score: ${sc} | ${ts}`, false);
+    } else if (latest.severity === 'WARNING') {
+      showToast(`⚠ ${t}`, `score: ${sc} | ${ts}`, true);
+    }
+  } catch(e) {}
+}
+
+setInterval(pollMotion, 3000);
+pollMotion();
 </script>
 </body>
 </html>
