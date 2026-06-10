@@ -1,0 +1,49 @@
+experiment_id,timestamp,image_id,source_type,roi_x1,roi_y1,roi_x2,roi_y2,threshold_val,canny_low,canny_high,diff_threshold,min_area,cooldown,brightness,blur_score,event_type,severity,rule_used,note
+exp_d2597c02,2026-06-10T08:21:08,img_acfd1f3d60,demo_default,,,,,120,80,160,25,800,1.0,233.91,2689.05,OVER_EXPOSED_IMAGE,WARNING,brightness > 210,test1_default_params
+exp_3eaca9fe,2026-06-10T08:21:08,img_efd10c257e,demo_thresh80,,,,,80,80,160,25,800,1.0,233.91,2689.05,OVER_EXPOSED_IMAGE,WARNING,brightness > 210,test2_thresh80
+exp_fbeb0399,2026-06-10T08:21:08,img_93b217635f,demo_thresh180,,,,,180,80,160,25,800,1.0,233.91,2689.05,OVER_EXPOSED_IMAGE,WARNING,brightness > 210,test3_thresh180
+exp_0627ed6f,2026-06-10T08:21:08,img_2194badfca,demo_canny50,,,,,120,50,100,25,800,1.0,233.91,2689.05,OVER_EXPOSED_IMAGE,WARNING,brightness > 210,test4_canny_50_100
+exp_91c448f5,2026-06-10T08:21:08,img_477a7aa633,demo_canny150,,,,,120,150,250,25,800,1.0,233.91,2689.05,OVER_EXPOSED_IMAGE,WARNING,brightness > 210,test5_canny_150_250
+exp_71f7e92b,2026-06-10T08:21:08,img_7904080866,demo_roi_narrow,0,0,320,180,120,80,160,25,800,1.0,235.33,5525.22,OVER_EXPOSED_IMAGE,WARNING,brightness > 210,test6_roi_0_0_320_180
+exp_e8230be4,2026-06-10T08:21:11,img_8df692c2a4,motion_capture_advanced,,,,,120,80,160,15,500,0.0,233.91,2689.05,OVER_EXPOSED_IMAGE,WARNING,brightness > 210,"motion_score=1189.0, diff_threshold=15, min_area=500, cooldown=0.0"
+exp_55bdbdfe,2026-06-10T08:21:13,img_afe86fef69,motion_capture_advanced,,,,,120,80,160,40,500,0.0,233.91,2689.05,OVER_EXPOSED_IMAGE,WARNING,brightness > 210,"motion_score=1133.5, diff_threshold=40, min_area=500, cooldown=0.0"
+exp_7987e307,2026-06-10T08:21:15,img_9f62bd9db3,motion_capture_advanced,,,,,120,80,160,25,1500,0.0,233.91,2689.05,OVER_EXPOSED_IMAGE,WARNING,brightness > 210,"motion_score=1162.0, diff_threshold=25, min_area=1500, cooldown=0.0"
+exp_f4e493d0,2026-06-10T08:21:17,img_95d1446829,motion_capture_advanced,,,,,120,80,160,15,500,5.0,233.91,2689.05,OVER_EXPOSED_IMAGE,WARNING,brightness > 210,"motion_score=1189.0, diff_threshold=15, min_area=500, cooldown=5.0"
+exp_ec926216,2026-06-10T08:26:27,img_efeae71b96,camera,,,,,120,80,160,25,800,1.0,126.22,46.19,BLURRY_IMAGE,WARNING,blur_score < 80,snapshot_advanced
+exp_a8fc35d9,2026-06-10T08:26:32,img_6c309e8ec5,camera,,,,,120,80,160,25,800,1.0,126.2,46.13,BLURRY_IMAGE,WARNING,blur_score < 80,snapshot_advanced
+exp_c50def5f,2026-06-10T08:27:31,img_9eaa3c8755,upload,,,,,120,80,160,25,800,1.0,91.47,646.85,IMAGE_QUALITY_OK,NORMAL,brightness 60-210 AND blur_score >= 80,"filename=We,American,Vietkong.png"
+exp_1d46ba61,2026-06-10T08:45:10,img_1a9b962eb4,camera,,,,,120,80,160,25,800,1.0,44.47,11.85,LOW_LIGHT,WARNING,brightness < 60,snapshot_advanced
+exp_7aca2247,2026-06-10T08:45:14,img_e21db035db,camera,,,,,120,80,160,25,800,1.0,44.7,14.76,LOW_LIGHT,WARNING,brightness < 60,snapshot_advanced
+exp_308e4809,2026-06-10T08:46:01,img_a6d567660a,upload,,,,,120,80,160,25,800,1.0,147.79,278.32,IMAGE_QUALITY_OK,NORMAL,brightness 60-210 AND blur_score >= 80,filename=CRD TR.jpg
+exp_79ec5f7d,2026-06-10T08:46:03,img_6f338da457,upload,,,,,120,80,160,25,800,1.0,147.79,278.32,IMAGE_QUALITY_OK,NORMAL,brightness 60-210 AND blur_score >= 80,filename=CRD TR.jpg
+exp_b4b55525,2026-06-10T09:19:01,img_a6afc383af,upload,,,,,120,80,160,25,800,1.0,87.6,444.28,IMAGE_QUALITY_OK,NORMAL,brightness 60-210 AND blur_score >= 80,filename=8kEvVVf66lPd79IGk1m39hdv6b1UkYWf5Ihb9FLmtxHlHGUZ8HJuSmTmRuzsSeJOx_H5UdrTfk4chuntemW3Cw.webp
+exp_19ebb2dd,2026-06-10T09:19:01,img_a4fc5eefec,upload,,,,,120,80,160,25,800,1.0,87.6,444.28,IMAGE_QUALITY_OK,NORMAL,brightness 60-210 AND blur_score >= 80,filename=8kEvVVf66lPd79IGk1m39hdv6b1UkYWf5Ihb9FLmtxHlHGUZ8HJuSmTmRuzsSeJOx_H5UdrTfk4chuntemW3Cw.webp
+exp_6541ab0c,2026-06-10T09:19:01,img_f615cf9334,upload,,,,,120,80,160,25,800,1.0,87.6,444.28,IMAGE_QUALITY_OK,NORMAL,brightness 60-210 AND blur_score >= 80,filename=8kEvVVf66lPd79IGk1m39hdv6b1UkYWf5Ihb9FLmtxHlHGUZ8HJuSmTmRuzsSeJOx_H5UdrTfk4chuntemW3Cw.webp
+exp_d5c8cd84,2026-06-10T09:19:01,img_26518394f3,upload,,,,,120,80,160,25,800,1.0,87.6,444.28,IMAGE_QUALITY_OK,NORMAL,brightness 60-210 AND blur_score >= 80,filename=8kEvVVf66lPd79IGk1m39hdv6b1UkYWf5Ihb9FLmtxHlHGUZ8HJuSmTmRuzsSeJOx_H5UdrTfk4chuntemW3Cw.webp
+exp_e2c1381c,2026-06-10T09:19:01,img_05515104ad,upload,,,,,120,80,160,25,800,1.0,87.6,444.28,IMAGE_QUALITY_OK,NORMAL,brightness 60-210 AND blur_score >= 80,filename=8kEvVVf66lPd79IGk1m39hdv6b1UkYWf5Ihb9FLmtxHlHGUZ8HJuSmTmRuzsSeJOx_H5UdrTfk4chuntemW3Cw.webp
+exp_e5049d4f,2026-06-10T09:19:01,img_7052c87a8a,upload,,,,,120,80,160,25,800,1.0,87.6,444.28,IMAGE_QUALITY_OK,NORMAL,brightness 60-210 AND blur_score >= 80,filename=8kEvVVf66lPd79IGk1m39hdv6b1UkYWf5Ihb9FLmtxHlHGUZ8HJuSmTmRuzsSeJOx_H5UdrTfk4chuntemW3Cw.webp
+exp_a9718300,2026-06-10T09:19:01,img_9387baab6f,upload,,,,,120,80,160,25,800,1.0,87.6,444.28,IMAGE_QUALITY_OK,NORMAL,brightness 60-210 AND blur_score >= 80,filename=8kEvVVf66lPd79IGk1m39hdv6b1UkYWf5Ihb9FLmtxHlHGUZ8HJuSmTmRuzsSeJOx_H5UdrTfk4chuntemW3Cw.webp
+exp_d48dd355,2026-06-10T09:19:01,img_615fe2f717,upload,,,,,120,80,160,25,800,1.0,87.6,444.28,IMAGE_QUALITY_OK,NORMAL,brightness 60-210 AND blur_score >= 80,filename=8kEvVVf66lPd79IGk1m39hdv6b1UkYWf5Ihb9FLmtxHlHGUZ8HJuSmTmRuzsSeJOx_H5UdrTfk4chuntemW3Cw.webp
+exp_549a80e8,2026-06-10T09:19:04,img_2309d6c67c,upload,,,,,120,80,160,25,800,1.0,51.51,313.7,LOW_LIGHT,WARNING,brightness < 60,filename=unnamed.jpg
+exp_f5858c88,2026-06-10T09:19:04,img_b7b37604e0,upload,,,,,120,80,160,25,800,1.0,51.51,313.7,LOW_LIGHT,WARNING,brightness < 60,filename=unnamed.jpg
+exp_542a26f0,2026-06-10T09:19:04,img_49191ec270,upload,,,,,120,80,160,25,800,1.0,51.51,313.7,LOW_LIGHT,WARNING,brightness < 60,filename=unnamed.jpg
+exp_6dcb5196,2026-06-10T09:19:04,img_f5796f001b,upload,,,,,120,80,160,25,800,1.0,51.51,313.7,LOW_LIGHT,WARNING,brightness < 60,filename=unnamed.jpg
+exp_eb0858ab,2026-06-10T09:19:04,img_36e32c2e2a,upload,,,,,120,80,160,25,800,1.0,51.51,313.7,LOW_LIGHT,WARNING,brightness < 60,filename=unnamed.jpg
+exp_0e7a8374,2026-06-10T09:19:04,img_c06bd35b45,upload,,,,,120,80,160,25,800,1.0,51.51,313.7,LOW_LIGHT,WARNING,brightness < 60,filename=unnamed.jpg
+exp_621192ca,2026-06-10T09:19:04,img_0f9bbc6489,upload,,,,,120,80,160,25,800,1.0,51.51,313.7,LOW_LIGHT,WARNING,brightness < 60,filename=unnamed.jpg
+exp_6f8b961e,2026-06-10T09:19:04,img_195148a634,upload,,,,,120,80,160,25,800,1.0,51.51,313.7,LOW_LIGHT,WARNING,brightness < 60,filename=unnamed.jpg
+exp_8126f056,2026-06-10T09:19:04,img_ac15a49325,upload,,,,,120,80,160,25,800,1.0,51.51,313.7,LOW_LIGHT,WARNING,brightness < 60,filename=unnamed.jpg
+exp_101ccba7,2026-06-10T09:19:04,img_2efd924db4,upload,,,,,120,80,160,25,800,1.0,51.51,313.7,LOW_LIGHT,WARNING,brightness < 60,filename=unnamed.jpg
+exp_3c6f10f9,2026-06-10T09:19:05,img_18919d8ca3,upload,,,,,120,80,160,25,800,1.0,51.51,313.7,LOW_LIGHT,WARNING,brightness < 60,filename=unnamed.jpg
+exp_4e62d857,2026-06-10T09:19:05,img_053e1b11ba,upload,,,,,120,80,160,25,800,1.0,51.51,313.7,LOW_LIGHT,WARNING,brightness < 60,filename=unnamed.jpg
+exp_d15832ce,2026-06-10T09:19:05,img_d4641450b7,upload,,,,,120,80,160,25,800,1.0,51.51,313.7,LOW_LIGHT,WARNING,brightness < 60,filename=unnamed.jpg
+exp_5954a610,2026-06-10T09:19:05,img_5cedc1a482,upload,,,,,120,80,160,25,800,1.0,51.51,313.7,LOW_LIGHT,WARNING,brightness < 60,filename=unnamed.jpg
+exp_505fdf54,2026-06-10T09:19:05,img_6afe4f3e46,upload,,,,,120,80,160,25,800,1.0,51.51,313.7,LOW_LIGHT,WARNING,brightness < 60,filename=unnamed.jpg
+exp_a58faeb6,2026-06-10T09:19:05,img_108c063106,upload,,,,,120,80,160,25,800,1.0,51.51,313.7,LOW_LIGHT,WARNING,brightness < 60,filename=unnamed.jpg
+exp_193b02ea,2026-06-10T09:19:05,img_9eed10339e,upload,,,,,120,80,160,25,800,1.0,51.51,313.7,LOW_LIGHT,WARNING,brightness < 60,filename=unnamed.jpg
+exp_593cd40f,2026-06-10T09:19:05,img_360adb391f,upload,,,,,120,80,160,25,800,1.0,51.51,313.7,LOW_LIGHT,WARNING,brightness < 60,filename=unnamed.jpg
+exp_de2b3327,2026-06-10T09:19:05,img_375f7b9315,upload,,,,,120,80,160,25,800,1.0,51.51,313.7,LOW_LIGHT,WARNING,brightness < 60,filename=unnamed.jpg
+exp_ac0580ee,2026-06-10T09:19:05,img_e0e991456e,upload,,,,,120,80,160,25,800,1.0,51.51,313.7,LOW_LIGHT,WARNING,brightness < 60,filename=unnamed.jpg
+exp_39cd9be0,2026-06-10T09:19:05,img_bd172b3929,upload,,,,,120,80,160,25,800,1.0,51.51,313.7,LOW_LIGHT,WARNING,brightness < 60,filename=unnamed.jpg
+exp_26b0dc6b,2026-06-10T09:19:27,img_9388d3e84b,motion_capture_advanced,,,,,120,80,160,25,800,1.0,145.37,69.94,BLURRY_IMAGE,WARNING,blur_score < 80,"motion_score=52186.0, diff_threshold=25, min_area=800, cooldown=1.0"
+exp_32a369d3,2026-06-10T09:21:19,img_960897648e,upload,,,,,120,80,160,25,800,1.0,51.51,313.7,LOW_LIGHT,WARNING,brightness < 60,filename=unnamed.jpg

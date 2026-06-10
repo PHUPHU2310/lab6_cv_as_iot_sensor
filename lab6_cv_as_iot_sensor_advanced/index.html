@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lab 6 Advanced - CV as IoT Sensor: Parameter Experiment</title>
+<style>
+:root{--blue:#0b3f75;--orange:#e07b20;--green:#15803d;--red:#b91c1c;--bg:#f4f6fb;--card:#fff;--line:#dce5f0;--text:#1e2836;}
+*{box-sizing:border-box;}
+body{font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);margin:0;}
+header{background:linear-gradient(90deg,#0b3f75,#155ea0);color:#fff;padding:18px 28px;}
+header h1{margin:0 0 4px;font-size:24px;}
+header p{margin:0;opacity:.9;font-size:14px;}
+main{max-width:1360px;margin:18px auto;padding:0 16px 36px;}
+h2{margin:0 0 8px;font-size:17px;color:var(--blue);}
+h3{margin:0 0 6px;font-size:15px;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0;box-shadow:0 2px 8px rgba(20,40,80,.06);}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+@media(max-width:960px){.grid2,.grid3,.grid4{grid-template-columns:1fr;}}
+button{background:var(--blue);color:#fff;border:0;border-radius:8px;padding:8px 13px;margin:3px;cursor:pointer;font-weight:600;font-size:13px;}
+button.sec{background:#5b6472;}
+button.warn{background:#b45309;}
+button.grn{background:var(--green);}
+input,select{padding:7px 9px;border:1px solid #b8c4d6;border-radius:8px;font-size:13px;width:100%;}
+label{font-size:12px;color:#4b5563;display:block;margin:5px 0 2px;}
+.small{font-size:12px;color:#4b5563;}
+.metric{font-size:26px;font-weight:700;color:var(--blue);}
+img{max-width:100%;border:1px solid #ccd6e0;border-radius:8px;background:#eef2f7;}
+#stream{width:100%;min-height:230px;object-fit:contain;}
+pre{background:#0b1220;color:#e5e7eb;border-radius:10px;padding:12px;overflow:auto;max-height:340px;font-size:12px;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th,td{border-bottom:1px solid #e5e7eb;padding:6px 8px;text-align:left;}
+th{background:#eef4fb;color:var(--blue);font-size:12px;}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;margin-left:4px;}
+.badge-warn{background:#fef3c7;color:#92400e;}
+.badge-ok{background:#dcfce7;color:#166534;}
+.badge-blue{background:#dbeafe;color:#1e40af;}
+.param-group{background:#f8faff;border:1px solid #dce5f0;border-radius:10px;padding:12px;margin-bottom:10px;}
+.param-group h4{margin:0 0 8px;font-size:13px;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;}
+.event-NORMAL{color:var(--green);}
+.event-WARNING{color:var(--red);}
+hr{border:0;border-top:1px solid var(--line);margin:14px 0;}
+</style>
+</head>
+<body>
+<header>
+<h1>Lab 6 Advanced — Computer Vision as IoT Sensor: Parameter Experiment</h1>
+<p>ROI · Threshold · Canny Edge · Brightness · Blur Score · Motion Score · Event Rule · Parameter Log → Dashboard</p>
+</header>
+<main>
+
+<!-- ===== SECTION 1: CAMERA + PARAMS ===== -->
+<section class="card">
+<h2>1. Camera &amp; Tham số xử lý ảnh</h2>
+<p class="small">Điều chỉnh các tham số rồi chụp snapshot hoặc chạy motion capture để quan sát kết quả thay đổi theo từng cấu hình.</p>
+
+<div class="grid2">
+<!-- Camera source -->
+<div>
+  <div class="param-group">
+    <h4>Camera source</h4>
+    <label>Source (0 = laptop, URL = IP camera)</label>
+    <input id="source" value="0" />
+    <div style="margin-top:8px">
+      <button onclick="startStream()">▶ Bật stream</button>
+      <button class="sec" onclick="stopStream()">■ Dừng</button>
+    </div>
+  </div>
+  <div class="param-group">
+    <h4>ROI — Region of Interest</h4>
+    <p class="small">Nhập x1,y1,x2,y2 hoặc để trống cho toàn khung. VD: <code>80,60,560,300</code></p>
+    <label>ROI (x1,y1,x2,y2 hoặc để trống)</label>
+    <input id="roi" value="" placeholder="VD: 80,60,560,300 hoặc để trống" />
+    <p class="small" style="margin-top:4px">ROI xanh lá sẽ hiển thị trên stream. Hệ thống chỉ phân tích vùng này để tính brightness, blur_score và motion.</p>
+  </div>
+</div>
+
+<!-- Processing params -->
+<div>
+  <div class="param-group">
+    <h4>Threshold ảnh xám</h4>
+    <p class="small">Điều khiển mức tách sáng/tối. Thấp → giữ nhiều vùng sáng. Cao → chỉ giữ vùng rất sáng.</p>
+    <label>Threshold value (0–255)</label>
+    <input id="threshVal" type="number" min="0" max="255" value="120" />
+  </div>
+  <div class="param-group">
+    <h4>Canny Edge</h4>
+    <p class="small">low quá thấp → nhiễu biên. high quá cao → mất biên mờ.</p>
+    <label>Canny Low</label>
+    <input id="cannyLow" type="number" min="0" max="500" value="80" />
+    <label>Canny High</label>
+    <input id="cannyHigh" type="number" min="0" max="500" value="160" />
+  </div>
+</div>
+</div>
+
+<!-- Action buttons -->
+<hr>
+<button onclick="snapshotAdv()">📷 Chụp snapshot</button>
+<button class="warn" onclick="recordVideo()">🎥 Ghi video 5s</button>
+<button class="grn" onclick="openMotionPanel()">🏃 Motion capture</button>
+<button class="sec" onclick="uploadPanel()">⬆ Upload ảnh</button>
+</section>
+
+<!-- ===== SECTION 2: STREAM ===== -->
+<div class="grid2">
+<section class="card">
+  <h3>Live stream <span class="badge badge-blue" id="streamStatus">Chưa bật</span></h3>
+  <img id="stream" alt="Camera stream" />
+  <p class="small" style="margin-top:6px">ROI hiển thị màu xanh lá trên stream. Chỉnh ROI input rồi bật lại stream để cập nhật.</p>
+</section>
+<section class="card">
+  <h3>Upload ảnh có sẵn</h3>
+  <p class="small">Đưa ảnh từ máy vào pipeline với tham số hiện tại.</p>
+  <input id="file" type="file" accept="image/*" />
+  <div style="margin-top:8px">
+    <button onclick="uploadImage()">⬆ Upload &amp; xử lý ảnh</button>
+  </div>
+</section>
+</div>
+
+<!-- ===== SECTION 3: MOTION PARAMS ===== -->
+<section class="card" id="motionPanel">
+<h2>3. Motion Capture — Tham số phát hiện chuyển động</h2>
+<div class="grid3">
+  <div class="param-group">
+    <h4>Diff Threshold</h4>
+    <p class="small">Pixel-level sensitivity. Thấp → nhạy hơn. Cao → bỏ qua thay đổi nhỏ.</p>
+    <label>Diff threshold (1–255)</label>
+    <input id="diffThresh" type="number" min="1" max="255" value="25" />
+  </div>
+  <div class="param-group">
+    <h4>Min Area</h4>
+    <p class="small">Diện tích contour tối thiểu để ghi nhận chuyển động. Quá thấp → alert fatigue.</p>
+    <label>Min area (pixel²)</label>
+    <input id="minArea" type="number" min="10" max="50000" value="800" />
+  </div>
+  <div class="param-group">
+    <h4>Cooldown</h4>
+    <p class="small">Khoảng thời gian tối thiểu (giây) giữa hai event. 0 = không cooldown.</p>
+    <label>Cooldown (giây)</label>
+    <input id="cooldown" type="number" min="0" max="60" step="0.5" value="1" />
+  </div>
+</div>
+<div style="margin-top:4px">
+  <label>Thời gian quét (giây)</label>
+  <input id="motionSecs" type="number" min="1" max="30" value="5" style="width:100px" />
+  <button onclick="motionCaptureAdv()" style="margin-left:8px">▶ Chạy motion capture</button>
+</div>
+</section>
+
+<!-- ===== SECTION 4: RESULTS ===== -->
+<div class="grid2">
+<section class="card">
+  <h3>Ảnh gốc / snapshot mới nhất</h3>
+  <img id="raw" alt="Raw image" />
+</section>
+<section class="card">
+  <h3>Ảnh xử lý 6 bước (advanced contact sheet)</h3>
+  <p class="small">1.Original+ROI · 2.Grayscale · 3.Threshold · 4.Canny Edge · 5.Mask Combined · 6.Quality Info</p>
+  <img id="processed" alt="Processed steps" />
+</section>
+</div>
+
+<!-- ===== SECTION 5: METRICS ===== -->
+<div class="grid4">
+<div class="card"><div class="metric" id="metadataCount">0</div><div class="small">ảnh đã ghi metadata</div></div>
+<div class="card"><div class="metric" id="eventCount">0</div><div class="small">event đã sinh</div></div>
+<div class="card"><div class="metric" id="paramCount">0</div><div class="small">experiment đã log</div></div>
+<div class="card"><div class="metric" id="latestEvent">-</div><div class="small" id="latestSeverity">event mới nhất</div></div>
+</div>
+
+<!-- ===== SECTION 6: JSON RESPONSE ===== -->
+<section class="card">
+<h2>4. JSON Response — Kết quả thao tác gần nhất</h2>
+<pre id="out">Chưa có dữ liệu. Thực hiện snapshot, upload ảnh hoặc motion capture để xem kết quả.</pre>
+</section>
+
+<!-- ===== SECTION 7: TABLES ===== -->
+<div class="grid2">
+<section class="card">
+  <h2>5. Metadata ảnh</h2>
+  <p class="small">Mô tả ảnh: nguồn, kích thước, brightness, blur_score, ROI, tham số xử lý và đường dẫn.</p>
+  <div id="metadataTable"></div>
+</section>
+<section class="card">
+  <h2>6. Event log</h2>
+  <p class="small">Event sinh từ mỗi ảnh: LOW_LIGHT, BLURRY_IMAGE, OVER_EXPOSED_IMAGE, IMAGE_QUALITY_OK, MOTION_DETECTED, v.v.</p>
+  <div id="eventTable"></div>
+</section>
+</div>
+
+<!-- ===== SECTION 8: PARAM LOG ===== -->
+<section class="card">
+<h2>7. Parameter Experiment Log — <code>parameter_experiment_log.csv</code></h2>
+<p class="small">Mỗi lần thay đổi tham số và thực hiện thao tác đều được ghi lại tại đây. Dùng để phân tích ảnh hưởng của tham số lên event và chất lượng ảnh.</p>
+<div id="paramTable"></div>
+</section>
+
+</main>
+
+<script>
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+function src()  { return encodeURIComponent(document.getElementById('source').value || '0'); }
+function roi()  { return encodeURIComponent(document.getElementById('roi').value || ''); }
+function tv()   { return parseInt(document.getElementById('threshVal').value) || 120; }
+function cl()   { return parseInt(document.getElementById('cannyLow').value)  || 80; }
+function ch()   { return parseInt(document.getElementById('cannyHigh').value) || 160; }
+function dt()   { return parseInt(document.getElementById('diffThresh').value) || 25; }
+function ma()   { return parseInt(document.getElementById('minArea').value)    || 800; }
+function cd()   { return parseFloat(document.getElementById('cooldown').value) || 1.0; }
+function ms()   { return parseInt(document.getElementById('motionSecs').value) || 5; }
+
+function setOut(data) {
+  document.getElementById('out').textContent = JSON.stringify(data, null, 2);
+}
+
+function setImages(data) {
+  if (data.raw_image_url)       document.getElementById('raw').src       = data.raw_image_url       + '?t=' + Date.now();
+  if (data.processed_image_url) document.getElementById('processed').src = data.processed_image_url + '?t=' + Date.now();
+}
+
+function tableFromRows(rows, cols) {
+  if (!rows || rows.length === 0) return '<p class="small">Chưa có dữ liệu.</p>';
+  let html = '<table><thead><tr>' + cols.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
+  for (const row of [...rows].reverse()) {
+    const evType = row['event_type'] || '';
+    const sev    = row['severity']   || '';
+    const cls    = sev === 'WARNING' ? ' class="event-WARNING"' : (sev === 'NORMAL' ? ' class="event-NORMAL"' : '');
+    html += `<tr${cls}>` + cols.map(c => `<td>${row[c] ?? ''}</td>`).join('') + '</tr>';
+  }
+  return html + '</tbody></table>';
+}
+
+// ---------------------------------------------------------------------------
+// Stream
+// ---------------------------------------------------------------------------
+function startStream() {
+  const url = `/video_feed?source=${src()}&roi=${roi()}&t=${Date.now()}`;
+  document.getElementById('stream').src = url;
+  document.getElementById('streamStatus').textContent = 'Active';
+  document.getElementById('streamStatus').className = 'badge badge-ok';
+}
+function stopStream() {
+  document.getElementById('stream').src = '';
+  document.getElementById('streamStatus').textContent = 'Stopped';
+  document.getElementById('streamStatus').className = 'badge badge-warn';
+}
+function openMotionPanel() {
+  document.getElementById('motionPanel').scrollIntoView({behavior:'smooth'});
+}
+function uploadPanel() {
+  document.getElementById('file').click();
+}
+
+// ---------------------------------------------------------------------------
+// API calls
+// ---------------------------------------------------------------------------
+async function snapshotAdv() {
+  const url = `/snapshot-advanced?source=${src()}&roi=${roi()}&threshold_val=${tv()}&canny_low=${cl()}&canny_high=${ch()}`;
+  const r = await fetch(url);
+  const d = await r.json();
+  setOut(d); setImages(d); refreshDashboard();
+}
+
+async function recordVideo() {
+  const r = await fetch(`/record-video?source=${src()}&seconds=5`);
+  const d = await r.json();
+  setOut(d); refreshDashboard();
+}
+
+async function motionCaptureAdv() {
+  const url = `/motion-capture-advanced?source=${src()}&seconds=${ms()}`
+    + `&diff_threshold=${dt()}&min_area=${ma()}&cooldown=${cd()}`
+    + `&roi=${roi()}&threshold_val=${tv()}&canny_low=${cl()}&canny_high=${ch()}`;
+  const r = await fetch(url);
+  const d = await r.json();
+  setOut(d); setImages(d); refreshDashboard();
+}
+
+async function uploadImage() {
+  const f = document.getElementById('file').files[0];
+  if (!f) { alert('Cần chọn một ảnh.'); return; }
+  const fd = new FormData();
+  fd.append('file', f);
+  const params = `?device_id=upload_dashboard&roi=${roi()}&threshold_val=${tv()}&canny_low=${cl()}&canny_high=${ch()}`;
+  const r = await fetch('/upload-image-advanced' + params, { method: 'POST', body: fd });
+  const d = await r.json();
+  setOut(d); setImages(d); refreshDashboard();
+}
+
+// ---------------------------------------------------------------------------
+// Dashboard refresh
+// ---------------------------------------------------------------------------
+async function refreshDashboard() {
+  const latest = await (await fetch('/latest')).json();
+  document.getElementById('metadataCount').textContent = latest.metadata_count      || 0;
+  document.getElementById('eventCount').textContent    = latest.event_count         || 0;
+  document.getElementById('paramCount').textContent    = latest.param_experiment_count || 0;
+
+  const evType = latest.latest_event?.event_type || '-';
+  const sev    = latest.latest_event?.severity   || '';
+  document.getElementById('latestEvent').textContent = evType;
+  document.getElementById('latestEvent').className   = 'metric ' + (sev === 'WARNING' ? 'event-WARNING' : (sev === 'NORMAL' ? 'event-NORMAL' : ''));
+  document.getElementById('latestSeverity').textContent = sev ? `severity: ${sev}` : 'event mới nhất';
+
+  if (latest.raw_image_url)       document.getElementById('raw').src       = latest.raw_image_url       + '?t=' + Date.now();
+  if (latest.processed_image_url) document.getElementById('processed').src = latest.processed_image_url + '?t=' + Date.now();
+
+  const metaResp  = await (await fetch('/metadata?limit=10')).json();
+  const evResp    = await (await fetch('/events?limit=10')).json();
+  const paramResp = await (await fetch('/parameter-experiments?limit=15')).json();
+
+  document.getElementById('metadataTable').innerHTML = tableFromRows(
+    metaResp.items,
+    ['image_id','timestamp','source_type','brightness','blur_score','roi','threshold_val','canny_low','canny_high']
+  );
+  document.getElementById('eventTable').innerHTML = tableFromRows(
+    evResp.items,
+    ['event_type','timestamp','severity','score','rule_used','explanation']
+  );
+  document.getElementById('paramTable').innerHTML = tableFromRows(
+    paramResp.items,
+    ['experiment_id','timestamp','source_type','roi_x1','roi_y1','roi_x2','roi_y2',
+     'threshold_val','canny_low','canny_high','diff_threshold','min_area','cooldown',
+     'brightness','blur_score','event_type','severity','rule_used']
+  );
+}
+
+refreshDashboard();
+setInterval(refreshDashboard, 6000);
+</script>
+</body>
+</html>

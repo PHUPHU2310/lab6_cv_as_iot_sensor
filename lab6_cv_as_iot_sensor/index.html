@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lab 6 - Computer Vision as IoT Sensor</title>
+<style>
+:root{--blue:#0b3f75;--orange:#f28c28;--bg:#f5f7fb;--card:#ffffff;--line:#d9e1ec;--text:#1f2937;}
+body{font-family:Arial, Helvetica, sans-serif;background:var(--bg);color:var(--text);margin:0;}
+header{background:linear-gradient(90deg,#0b3f75,#145da0);color:white;padding:20px 28px;}
+header h1{margin:0 0 6px 0;font-size:26px;}
+header p{margin:0;opacity:.95;}
+main{max-width:1240px;margin:20px auto;padding:0 18px 32px;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0;box-shadow:0 2px 8px rgba(20,40,80,.05);}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+@media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr;}}
+button{background:#0b5cad;color:white;border:0;border-radius:8px;padding:9px 12px;margin:4px;cursor:pointer;font-weight:600;}
+button.secondary{background:#5b6472;} button.warn{background:#b45309;}
+input{padding:8px;border:1px solid #b8c4d6;border-radius:8px;min-width:320px;}
+.small{font-size:13px;color:#4b5563;}.metric{font-size:28px;font-weight:700;color:#0b3f75;}
+img{max-width:100%;border:1px solid #ccd6e0;border-radius:10px;background:#eef2f7;}
+#stream{width:100%;min-height:270px;object-fit:contain;}
+pre{background:#0b1220;color:#e5e7eb;border-radius:10px;padding:12px;overflow:auto;max-height:360px;}
+table{width:100%;border-collapse:collapse;font-size:13px;} th,td{border-bottom:1px solid #e5e7eb;padding:8px;text-align:left;} th{background:#eef4fb;color:#0b3f75;}
+.badge{display:inline-block;background:#e8f2ff;color:#0b3f75;padding:3px 8px;border-radius:999px;font-size:12px;font-weight:700;margin-left:6px;}
+</style>
+</head>
+<body>
+<header>
+<h1>Lab 6 - Computer Vision as IoT Sensor</h1>
+<p>Camera/ảnh được đưa vào hệ thống như một cảm biến IoT: stream → snapshot/video/motion → xử lý ảnh → metadata → event → dashboard.</p>
+</header>
+<main>
+<section class="card">
+<h2>1. Điều khiển camera stream <span class="badge">Laptop camera hoặc IP camera</span></h2>
+<p class="small">Nhập <b>0</b> cho camera laptop. Với IP camera, nhập URL stream/snapshot, ví dụ <code>http://192.168.1.10:8080/video</code> hoặc <code>rtsp://...</code>. Nếu không có camera, hệ thống tự dùng stream mô phỏng để bài lab vẫn chạy được.</p>
+<label>Camera source: </label><input id="source" value="0" />
+<div style="margin-top:10px">
+<button onclick="startStream()">Bật stream</button>
+<button class="secondary" onclick="stopStream()">Dừng stream</button>
+<button onclick="snapshot()">Chụp snapshot</button>
+<button class="warn" onclick="recordVideo()">Ghi video 5s</button>
+<button onclick="motionCapture()">Phát hiện chuyển động và chụp ảnh</button>
+</div>
+</section>
+<section class="grid2">
+<div class="card"><h3>Live stream</h3><img id="stream" alt="Camera stream" /></div>
+<div class="card"><h3>Upload ảnh có sẵn</h3><p class="small">Dùng khi chưa có camera hoặc cần kiểm tra pipeline bằng ảnh mẫu.</p><input id="file" type="file" accept="image/*" /><br><button onclick="uploadImage()">Upload và xử lý ảnh</button></div>
+</section>
+<section class="grid2">
+<div class="card"><h3>Ảnh gốc / snapshot mới nhất</h3><img id="raw" alt="Raw image" /></div>
+<div class="card"><h3>Ảnh xử lý bốn bước</h3><p class="small">Một ảnh tổng hợp gồm: resize, grayscale, threshold và edge. Đây là phần quan sát trực quan nhất của pipeline xử lý ảnh.</p><img id="processed" alt="Processed steps" /></div>
+</section>
+<section class="grid3">
+<div class="card"><div class="metric" id="metadataCount">0</div><div>ảnh đã ghi metadata</div></div>
+<div class="card"><div class="metric" id="eventCount">0</div><div>event đã sinh</div></div>
+<div class="card"><div class="metric" id="latestEvent">-</div><div>event mới nhất</div></div>
+</section>
+<section class="card"><h2>2. Kết quả thao tác gần nhất</h2><pre id="out">Chưa có dữ liệu. Thực hiện stream, snapshot, upload ảnh hoặc motion capture để quan sát JSON response.</pre></section>
+<section class="grid2">
+<div class="card"><h2>3. Metadata ảnh</h2><p class="small">Metadata cho biết ảnh đến từ đâu, khi nào, kích thước bao nhiêu, độ sáng và đường dẫn lưu ở đâu.</p><div id="metadataTable"></div></div>
+<div class="card"><h2>4. Event ảnh</h2><p class="small">Event là thông tin vận hành sinh từ ảnh, ví dụ ảnh đã xử lý, ảnh tối, có chuyển động hoặc đã ghi video.</p><div id="eventTable"></div></div>
+</section>
+</main>
+<script>
+function source(){ return encodeURIComponent(document.getElementById('source').value || '0'); }
+function setOut(data){ document.getElementById('out').textContent = JSON.stringify(data, null, 2); }
+function setImages(data){ if(data.raw_image_url){document.getElementById('raw').src=data.raw_image_url+'?t='+Date.now();} if(data.processed_image_url){document.getElementById('processed').src=data.processed_image_url+'?t='+Date.now();} if(data.video_url){ setOut({...data, note:'Video đã được lưu; mở đường dẫn video_url nếu trình duyệt hỗ trợ.'}); } }
+function startStream(){ document.getElementById('stream').src='/video_feed?source='+source()+'&t='+Date.now(); }
+function stopStream(){ document.getElementById('stream').src=''; }
+async function snapshot(){ const r=await fetch('/snapshot?source='+source()); const d=await r.json(); setOut(d); setImages(d); refreshDashboard(); }
+async function recordVideo(){ const r=await fetch('/record-video?seconds=5&source='+source()); const d=await r.json(); setOut(d); refreshDashboard(); }
+async function motionCapture(){ const r=await fetch('/motion-capture?seconds=8&threshold=25&min_area=800&source='+source()); const d=await r.json(); setOut(d); setImages(d); refreshDashboard(); }
+async function uploadImage(){ const f=document.getElementById('file').files[0]; if(!f){alert('Cần chọn một ảnh.');return;} const fd=new FormData(); fd.append('file', f); const r=await fetch('/upload-image?device_id=image_upload_dashboard',{method:'POST',body:fd}); const d=await r.json(); setOut(d); setImages(d); refreshDashboard(); }
+function tableFromRows(rows, cols){ if(!rows || rows.length===0) return '<p class="small">Chưa có dữ liệu.</p>'; let html='<table><thead><tr>'; for(const c of cols){html+='<th>'+c+'</th>';} html+='</tr></thead><tbody>'; for(const row of rows.slice().reverse()){ html+='<tr>'; for(const c of cols){html+='<td>'+(row[c]??'')+'</td>';} html+='</tr>'; } html+='</tbody></table>'; return html; }
+async function refreshDashboard(){ const latest=await (await fetch('/latest')).json(); document.getElementById('metadataCount').textContent=latest.metadata_count || 0; document.getElementById('eventCount').textContent=latest.event_count || 0; document.getElementById('latestEvent').textContent=(latest.latest_event && latest.latest_event.event_type) ? latest.latest_event.event_type : '-'; if(latest.raw_image_url){document.getElementById('raw').src=latest.raw_image_url+'?t='+Date.now();} if(latest.processed_image_url){document.getElementById('processed').src=latest.processed_image_url+'?t='+Date.now();}
+ const meta=await (await fetch('/metadata?limit=8')).json(); const ev=await (await fetch('/events?limit=8')).json(); document.getElementById('metadataTable').innerHTML=tableFromRows(meta.items,['image_id','timestamp','source_type','width','height','brightness','processing_status']); document.getElementById('eventTable').innerHTML=tableFromRows(ev.items,['event_type','timestamp','severity','score','explanation']); }
+refreshDashboard(); setInterval(refreshDashboard, 5000);
+</script>
+</body>
+</html>

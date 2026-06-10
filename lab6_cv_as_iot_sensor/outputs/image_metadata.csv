@@ -1,0 +1,14 @@
+image_id,device_id,timestamp,source_type,image_path,processed_path,width,height,brightness,processing_status,processing_time_ms,note
+img_2d74745232,simulated_camera,2026-06-09T07:36:26,demo_script,data/raw_images/img_2d74745232.jpg,data/processed_images/img_2d74745232_processed_steps.jpg,640,360,233.55,processed,171.03,demo_frame=0
+img_e35d0bf94d,simulated_camera,2026-06-09T07:36:26,demo_script,data/raw_images/img_e35d0bf94d.jpg,data/processed_images/img_e35d0bf94d_processed_steps.jpg,640,360,233.55,processed,7.17,demo_frame=1
+img_494650f8dd,camera:no_camera_fallback,2026-06-09T07:36:29,motion_capture,data/raw_images/img_494650f8dd.jpg,data/processed_images/img_494650f8dd_processed_steps.jpg,640,360,233.55,processed,5.06,"motion_score=1162.0, threshold=25, min_area=800"
+img_40caf7cb85,simulated_camera,2026-06-10T08:09:10,demo_script,data\raw_images\img_40caf7cb85.jpg,data\processed_images\img_40caf7cb85_processed_steps.jpg,640,360,233.51,processed,38.43,demo_frame=0
+img_248b304cbc,simulated_camera,2026-06-10T08:09:10,demo_script,data\raw_images\img_248b304cbc.jpg,data\processed_images\img_248b304cbc_processed_steps.jpg,640,360,233.51,processed,6.8,demo_frame=1
+img_97fce25d61,camera:no_camera_fallback,2026-06-10T08:09:12,motion_capture,data\raw_images\img_97fce25d61.jpg,data\processed_images\img_97fce25d61_processed_steps.jpg,640,360,233.51,processed,8.49,"motion_score=1162.0, threshold=25, min_area=800"
+img_ea94128294,camera:0,2026-06-10T08:12:09,camera,data\raw_images\img_ea94128294.jpg,data\processed_images\img_ea94128294_processed_steps.jpg,640,480,116.81,processed,9.2,snapshot button
+img_61c33605ea,camera:0,2026-06-10T08:12:12,camera,data\raw_images\img_61c33605ea.jpg,data\processed_images\img_61c33605ea_processed_steps.jpg,640,480,116.7,processed,9.82,snapshot button
+img_28c94b3ffe,camera:0,2026-06-10T08:15:39,camera,data\raw_images\img_28c94b3ffe.jpg,data\processed_images\img_28c94b3ffe_processed_steps.jpg,640,480,115.15,processed,8.88,snapshot button
+img_bf8d2b5ccc,camera:0,2026-06-10T08:16:18,camera,data\raw_images\img_bf8d2b5ccc.jpg,data\processed_images\img_bf8d2b5ccc_processed_steps.jpg,640,480,118.43,processed,10.15,snapshot button
+img_d6ccac248c,camera:0,2026-06-10T08:17:07,camera,data\raw_images\img_d6ccac248c.jpg,data\processed_images\img_d6ccac248c_processed_steps.jpg,640,480,112.24,processed,9.71,snapshot button
+img_adbcb1c358,camera:0,2026-06-10T08:17:40,camera,data\raw_images\img_adbcb1c358.jpg,data\processed_images\img_adbcb1c358_processed_steps.jpg,640,480,126.25,processed,27.11,snapshot button
+img_833d352680,camera:0,2026-06-10T08:18:29,camera,data\raw_images\img_833d352680.jpg,data\processed_images\img_833d352680_processed_steps.jpg,640,480,116.9,processed,9.63,snapshot button

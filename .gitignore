@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Dữ liệu sinh ra khi chạy (không commit)
+lab6_cv_as_iot_sensor/data/raw_images/*.jpg
+lab6_cv_as_iot_sensor/data/raw_images/*.png
+lab6_cv_as_iot_sensor/data/processed_images/*.jpg
+lab6_cv_as_iot_sensor/data/processed_images/*.png
+lab6_cv_as_iot_sensor/data/videos/*.mp4
+lab6_cv_as_iot_sensor/data/videos/*.avi
+
+lab6_cv_as_iot_sensor_advanced/data/raw_images/*.jpg
+lab6_cv_as_iot_sensor_advanced/data/raw_images/*.png
+lab6_cv_as_iot_sensor_advanced/data/processed_images/*.jpg
+lab6_cv_as_iot_sensor_advanced/data/processed_images/*.png
+lab6_cv_as_iot_sensor_advanced/data/videos/*.mp4
+lab6_cv_as_iot_sensor_advanced/data/videos/*.avi
+
+# Giữ cấu trúc thư mục
+!lab6_cv_as_iot_sensor/data/raw_images/.gitkeep
+!lab6_cv_as_iot_sensor/data/processed_images/.gitkeep
+!lab6_cv_as_iot_sensor/data/videos/.gitkeep
+!lab6_cv_as_iot_sensor_advanced/data/raw_images/.gitkeep
+!lab6_cv_as_iot_sensor_advanced/data/processed_images/.gitkeep
+!lab6_cv_as_iot_sensor_advanced/data/videos/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

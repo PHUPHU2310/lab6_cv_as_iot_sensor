@@ -1,0 +1,15 @@
+LOCAL_PIPELINE_TEST_PASS
+{"test": "default_params", "image_id": "img_acfd1f3d60", "event_type": "OVER_EXPOSED_IMAGE"}
+{"test": "thresh_80", "image_id": "img_efd10c257e", "event_type": "OVER_EXPOSED_IMAGE"}
+{"test": "thresh_180", "image_id": "img_93b217635f", "event_type": "OVER_EXPOSED_IMAGE"}
+{"test": "canny_50_100", "image_id": "img_2194badfca", "event_type": "OVER_EXPOSED_IMAGE"}
+{"test": "canny_150_250", "image_id": "img_477a7aa633", "event_type": "OVER_EXPOSED_IMAGE"}
+{"test": "roi_narrow", "image_id": "img_7904080866", "event_type": "OVER_EXPOSED_IMAGE"}
+{"test": "motion_dt15", "image_id": "img_8df692c2a4", "event_type": "OVER_EXPOSED_IMAGE"}
+{"test": "motion_dt40", "image_id": "img_afe86fef69", "event_type": "OVER_EXPOSED_IMAGE"}
+{"test": "motion_ma1500", "image_id": "img_9f62bd9db3", "event_type": "OVER_EXPOSED_IMAGE"}
+{"test": "motion_cooldown5", "image_id": "img_95d1446829", "event_type": "OVER_EXPOSED_IMAGE"}
+{"test": "video_1s", "image_id": "vid_e0520b8a60", "event_type": "VIDEO_RECORDED"}
+{"csv": "image_metadata.csv", "rows": 10}
+{"csv": "image_event_log.csv", "rows": 15}
+{"csv": "parameter_experiment_log.csv", "rows": 10}
